@@ -47,14 +47,15 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { issueService } from '../services/issueService.js'
 
 export default {
   name: 'IssueList',
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const issues = ref([])
     const loading = ref(false)
     const selectedStatus = ref(null)
@@ -105,32 +106,21 @@ export default {
       return new Date(dateString).toLocaleDateString('ko-KR')
     }
 
-    // 라우터 내비게이션 감지
-    let routerUnwatch = null
-
-    // 컴포넌트가 마운트될 때 이슈 목록 로드
     onMounted(() => {
       loadIssues()
+    })
 
-      // 라우터 변경 감지하여 이슈 목록 페이지로 돌아올 때 데이터 다시 로드
-      routerUnwatch = router.afterEach((to, from) => {
-        if (to.name === 'IssueList' && from.name && from.name !== 'IssueList') {
-          // 약간의 지연을 주어 컴포넌트가 완전히 마운트된 후 로드
-          setTimeout(() => {
-            loadIssues()
-          }, 100)
+    watch(
+      () => route.query,
+      (query) => {
+        if (query && query.created === 'true') {
+          loadIssues()
+          router.replace('/issues/')
         }
-      })
-    })
+      },
+      { immediate: true },
+    )
 
-    // 컴포넌트 언마운트 시 정리
-    onUnmounted(() => {
-      if (routerUnwatch) {
-        routerUnwatch()
-      }
-    })
-
-    // 필터 변경 시 이슈 목록 다시 로드
     watch(selectedStatus, () => {
       loadIssues()
     })

@@ -232,12 +232,10 @@ export default {
           // 수정 완료 후 상세 페이지로 이동
           router.push(`/issues/${route.params.id}`)
         } else if (isCreateMode.value) {
-          // const newIssue = await issueService.createIssue(form.value)
+          await issueService.createIssue(form.value)
           alert('새 이슈가 생성되었습니다.')
           // 생성 완료 후에는 이슈 리스트로
-          router.push('/issues/')
-          // 생성 완료 후에는 이슈 상세 페이지로 이동 (이렇게도 구현할 수 있음음)
-          // router.push(`/issues/${route.params.id}`)
+          router.push('/issues/?created=true')
         }
       } catch (error) {
         console.error('이슈 저장 실패:', error)
