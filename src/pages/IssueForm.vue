@@ -99,7 +99,12 @@
       <!-- 상태 (수정 모드에서만 표시) -->
       <div v-if="isEditMode" class="form-group">
         <label for="status">상태</label>
-        <select id="status" v-model="form.status" :disabled="isStatusDisabled" class="form-input">
+        <select
+          id="status"
+          v-model="form.status"
+          :disabled="isStatusDisabled || isAssigneeDisabled"
+          class="form-input"
+        >
           <option
             v-for="status in statusOptions"
             :key="status.value"
@@ -109,8 +114,9 @@
             {{ status.label }}
           </option>
         </select>
-        <small v-if="isStatusDisabled" class="form-help">
-          담당자가 지정되지 않은 이슈는 상태를 변경할 수 없습니다.
+        <small v-if="isStatusDisabled || isAssigneeDisabled" class="form-help">
+          {{ isAssigneeDisabled ? '완료 또는 취소된 이슈는' : '담당자가 지정되지 않은 이슈는' }}
+          상태를 변경할 수 없습니다.
         </small>
       </div>
 
@@ -235,7 +241,7 @@ export default {
           await issueService.createIssue(form.value)
           alert('새 이슈가 생성되었습니다.')
           // 생성 완료 후에는 이슈 리스트로
-          router.push('/issues/?created=true')
+          router.push('/issues?created=true')
         }
       } catch (error) {
         console.error('이슈 저장 실패:', error)

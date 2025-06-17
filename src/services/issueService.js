@@ -3,7 +3,7 @@ import { issues as initialIssues, users } from '../data/mockData.js'
 
 // 환경 변수 확인
 const isDev = import.meta.env.VITE_MODE === 'DEV'
-const API_BASE_URL = 'http://localhost:8080'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // Mock 데이터를 위한 로컬 스토리지 (개발 모드에서만 사용)
 let issues = [...initialIssues]
@@ -92,9 +92,14 @@ const mockService = {
           newStatus = 'IN_PROGRESS'
         }
 
+        console.log('newStatus', newStatus)
+        console.log('existingIssue', existingIssue)
+
         const user = issueData.userId
           ? users.find((u) => u.id === issueData.userId)
           : existingIssue.user
+
+        console.log('user', user)
 
         const updatedIssue = {
           ...existingIssue,
